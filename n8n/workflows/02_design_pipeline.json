@@ -1,0 +1,94 @@
+{
+  "name": "Design Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 30
+            }
+          ]
+        }
+      },
+      "id": "1",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [100, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://api:8000/api/queue/stats",
+        "options": {}
+      },
+      "id": "2",
+      "name": "Get Stats",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [300, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.pending_count }}",
+              "operation": "larger",
+              "value2": 0
+            }
+          ]
+        }
+      },
+      "id": "3",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://api:8000/api/design/generate",
+        "options": {}
+      },
+      "id": "4",
+      "name": "Generate Design",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [700, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://api:8000/api/review/send",
+        "options": {}
+      },
+      "id": "5",
+      "name": "Send Review",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [900, 200]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [ [ { "node": "Get Stats", "type": "main", "index": 0 } ] ]
+    },
+    "Get Stats": {
+      "main": [ [ { "node": "IF", "type": "main", "index": 0 } ] ]
+    },
+    "IF": {
+      "main": [
+        [ { "node": "Generate Design", "type": "main", "index": 0 } ],
+        []
+      ]
+    },
+    "Generate Design": {
+      "main": [ [ { "node": "Send Review", "type": "main", "index": 0 } ] ]
+    }
+  },
+  "active": false,
+  "settings": {}
+}

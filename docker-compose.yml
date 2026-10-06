@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./n8n/workflows:/data/workflows
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=password
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=n8n
+      - DB_POSTGRESDB_USER=n8n
+      - DB_POSTGRESDB_PASSWORD=n8npassword
+    depends_on:
+      postgres:
+        condition: service_started
+    networks:
+      - aim_network
+
+  render-service:
+    build:
+      context: ./services/render
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+    networks:
+      - aim_network
+
+  api:
+    build:
+      context: .
+    ports:
+      - "8000:8000"
+    env_file: .env
+    depends_on:
+      - render-service
+    networks:
+      - aim_network
+
+  postgres:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=n8n
+      - POSTGRES_PASSWORD=n8npassword
+      - POSTGRES_DB=n8n
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - aim_network
+
+volumes:
+  n8n_data:
+  postgres_data:
+
+networks:
+  aim_network:

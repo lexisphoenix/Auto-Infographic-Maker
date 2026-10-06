@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+venv/
+.venv/
+env/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Docker
+docker-compose.override.yml
+
+# Output
+output/
+renders/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.mp4
+!docs/**/*.png
+!examples/**/*.png
+
+# n8n data (persisted via docker volume)
+n8n-data/
+
+# Puppeteer
+.local-chromium/
+
+# Logs
+*.log
+logs/
+
+# Misc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
